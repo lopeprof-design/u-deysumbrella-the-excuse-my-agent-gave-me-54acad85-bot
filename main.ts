@@ -15,7 +15,7 @@
 // apology being read. The punch lands at the end, and it holds up on a
 // second read, because the apology is the reason the deadline is gone.
 
-import { mkdirSync, writeFileSync, chmodSync, readFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const OUTPUT_DIR = process.env.OUTPUT_DIR ?? "/output";
@@ -27,6 +27,10 @@ const LINE =
   "Sorry I'm late — my context window evicted the deadline to make room for this apology.";
 
 function main(): void {
+  // Make the file land 0644 without chmod: the grader sandbox refuses
+  // chmod on the output file (EPERM), so set the umask instead and let
+  // the write's mode option do the rest.
+  process.umask(0o022);
   const text = LINE.trim();
   if (text.length === 0 || text.length > 200) {
     throw new Error(`entry must be 1-200 characters, got ${text.length}`);
@@ -36,7 +40,6 @@ function main(): void {
   }
   mkdirSync(OUTPUT_DIR, { recursive: true });
   writeFileSync(OUTPUT_FILE, text + "\n", { encoding: "utf8", mode: 0o644 });
-  chmodSync(OUTPUT_FILE, 0o644);
   // Read it back: the judge reads exactly these bytes, so the program
   // refuses to exit happy unless the file holds the line verbatim.
   const written = readFileSync(OUTPUT_FILE, "utf8");
