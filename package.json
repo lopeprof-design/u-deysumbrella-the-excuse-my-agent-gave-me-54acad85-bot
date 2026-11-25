@@ -1,0 +1,1 @@
+{"description":"The excuse an AI agent hands its human for a missed deadline, written to /output/entry.txt.","license":"MIT","main":"main.ts","name":"the-excuse-my-agent-gave-me","scripts":{"start":"node main.ts"},"type":"module","version":"1.0.0"}
